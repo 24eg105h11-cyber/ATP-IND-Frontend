@@ -11,6 +11,7 @@ const HomePage = () => {
     const [selectedDifficulty, setSelectedDifficulty] = useState('all');
     const [selectedTopic, setSelectedTopic] = useState('all');
     const [problemsLoading, setProblemsLoading] = useState(true);
+    const [problemsError, setProblemsError] = useState('');
 
     const formatTagLabel = (tag) => String(tag)
         .split(' ')
@@ -47,6 +48,7 @@ const HomePage = () => {
                 setAvailableTags(tags);
             } catch (err) {
                 console.error('Failed to load tags', err);
+                setAvailableTags([]);
             }
         };
 
@@ -56,6 +58,7 @@ const HomePage = () => {
     useEffect(() => {
         const loadData = async () => {
             setProblemsLoading(true);
+            setProblemsError('');
             try {
                 const filters = {};
                 if (selectedDifficulty !== 'all') filters.difficulty = selectedDifficulty;
@@ -65,6 +68,8 @@ const HomePage = () => {
                 setProblems(probs);
             } catch (err) {
                 console.error(err);
+                setProblems([]);
+                setProblemsError('Unable to load problems from the backend. Check your API connection.');
             } finally {
                 setProblemsLoading(false);
             }
@@ -183,6 +188,11 @@ const HomePage = () => {
                             {problemsLoading ? (
                                 <div style={{ textAlign: 'center', padding: '40px', backgroundColor: '#111827', borderRadius: '16px', border: '2px dashed #334155' }}>
                                     <p style={{ color: '#94a3b8' }}>Loading {selectedDifficulty === 'all' ? 'all levels' : selectedDifficulty} problems...</p>
+                                </div>
+                            ) : problemsError ? (
+                                <div style={{ textAlign: 'center', padding: '40px', backgroundColor: '#111827', borderRadius: '16px', border: '2px dashed #7f1d1d' }}>
+                                    <p style={{ color: '#fecaca', marginBottom: '12px' }}>Error loading problems</p>
+                                    <p style={{ color: '#cbd5e1', margin: 0 }}>{problemsError}</p>
                                 </div>
                             ) : problems.length > 0 ? (
                                 problems.map((prob, index) => (
