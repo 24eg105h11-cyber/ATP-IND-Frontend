@@ -138,6 +138,13 @@ const CodePlayground = () => {
   }, [allProblems, currentUser?.completedProblems, problem]);
 
   const [language, setLanguage] = useState('javascript');
+  const [supportedLanguages, setSupportedLanguages] = useState([
+    { label: 'JavaScript', value: 'javascript' },
+    { label: 'Python', value: 'python' },
+    { label: 'Java', value: 'java' },
+    { label: 'C', value: 'c' },
+    { label: 'C++', value: 'cpp' },
+  ]);
   const [code, setCode] = useState(currentTemplate.javascript);
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -194,7 +201,33 @@ const CodePlayground = () => {
       }
     };
 
+    const fetchSupportedLanguages = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/playground/languages`, { withCredentials: true });
+        const supported = response.data?.payload || [];
+        const languageOptions = [
+          { label: 'JavaScript', value: 'javascript' },
+          { label: 'Python', value: 'python' },
+          { label: 'Java', value: 'java' },
+          { label: 'C', value: 'c' },
+          { label: 'C++', value: 'cpp' },
+        ].filter((lang) => supported.includes(lang.value));
+
+        setSupportedLanguages(languageOptions.length ? languageOptions : [
+          { label: 'JavaScript', value: 'javascript' },
+          { label: 'Python', value: 'python' },
+        ]);
+
+        if (!languageOptions.some((lang) => lang.value === language)) {
+          setLanguage(languageOptions[0]?.value || 'javascript');
+        }
+      } catch (err) {
+        console.error('Failed to load supported languages', err);
+      }
+    };
+
     fetchProblemList();
+    fetchSupportedLanguages();
   }, []);
 
   useEffect(() => {
@@ -225,14 +258,7 @@ const CodePlayground = () => {
     fetchSubmissions();
   }, [activeInfoTab, problemId]);
 
-  const languages = [
-    { label: 'JavaScript', value: 'javascript' },
-    { label: 'Python', value: 'python' },
-    { label: 'Java', value: 'java' },
-    { label: 'C', value: 'c' },
-    { label: 'C++', value: 'cpp' },
-    { label: 'R', value: 'r' },
-  ];
+  const languages = supportedLanguages;
 
   const handleRunCode = async () => {
     setLoading(true);
