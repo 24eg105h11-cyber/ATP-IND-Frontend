@@ -1,8 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
-
-const BACKEND_URL = String(import.meta.env.VITE_BACKEND_URL || import.meta.env.BACKEND_URL || "http://localhost:4000").replace(/\/+$/, "");
-const API_BASE_URL = `${BACKEND_URL}/api`;
+import { API_BASE_URL } from "../utils/apiConfig";
 
 const getApiErrorMessage = (err, fallbackMessage) =>
   err.response?.data?.error || err.response?.data?.message || err.message || fallbackMessage;

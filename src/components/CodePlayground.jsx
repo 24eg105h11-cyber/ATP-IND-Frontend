@@ -8,6 +8,8 @@ import { API_BASE_URL } from '../utils/apiConfig';
 const CodePlayground = () => {
   const { problemId } = useParams();
   const [problem, setProblem] = useState(null);
+  const [problemLoading, setProblemLoading] = useState(false);
+  const [problemError, setProblemError] = useState('');
 
   const problemTemplates = useMemo(() => ({
     twoSum: {
@@ -151,26 +153,34 @@ const CodePlayground = () => {
   const [isFromSubmission, setIsFromSubmission] = useState(false);
 
   useEffect(() => {
-    if (problemId) {
-      const fetchProblemData = async () => {
-        try {
-          const problemRes = await axios.get(`${API_BASE_URL}/problems/${problemId}`, { withCredentials: true });
-          const fetchedProblem = problemRes.data.payload;
-          setProblem(fetchedProblem);
-          setCode(getBoilerplate(fetchedProblem?.templateKey || 'twoSum', language));
+    if (!problemId) return;
 
-          const testRes = await axios.get(`${API_BASE_URL}/testcases/problem/${problemId}`, { withCredentials: true });
-          const fetchedCases = testRes.data.payload || [];
-          setTestcases(fetchedCases);
-          if (fetchedCases.length > 0) {
-            setCustomInput(fetchedCases[0].input);
-          }
-        } catch (err) {
-          console.error("Failed to fetch problem data", err);
+    const fetchProblemData = async () => {
+      setProblemLoading(true);
+      setProblemError('');
+      setProblem(null);
+
+      try {
+        const problemRes = await axios.get(`${API_BASE_URL}/problems/${problemId}`, { withCredentials: true });
+        const fetchedProblem = problemRes.data.payload;
+        setProblem(fetchedProblem);
+        setCode(getBoilerplate(fetchedProblem?.templateKey || 'twoSum', language));
+
+        const testRes = await axios.get(`${API_BASE_URL}/testcases/problem/${problemId}`, { withCredentials: true });
+        const fetchedCases = testRes.data.payload || [];
+        setTestcases(fetchedCases);
+        if (fetchedCases.length > 0) {
+          setCustomInput(fetchedCases[0].input);
         }
-      };
-      fetchProblemData();
-    }
+      } catch (err) {
+        console.error("Failed to fetch problem data", err);
+        setProblemError(err.response?.data?.message || err.message || 'Unable to load the problem');
+      } finally {
+        setProblemLoading(false);
+      }
+    };
+
+    fetchProblemData();
   }, [problemId]);
 
   useEffect(() => {
@@ -529,6 +539,14 @@ const CodePlayground = () => {
               </div>
             )}
           </>
+        ) : problemLoading ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+            <p>Loading challenge details...</p>
+          </div>
+        ) : problemError ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#fca5a5' }}>
+            <p>{problemError}</p>
+          </div>
         ) : (
           <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
             <p>Select a challenge from the Home page to see details.</p>
