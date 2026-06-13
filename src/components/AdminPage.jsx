@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 const AdminPage = () => {
   // Add Problem States
@@ -42,7 +43,7 @@ const AdminPage = () => {
     setUsersLoading(true);
     setUsersMessage('');
     try {
-      const response = await axios.get('http://localhost:4000/api/users/admin/all-users', { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/users/admin/all-users`, { withCredentials: true });
       setUsers(response.data?.payload || []);
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || 'Failed to fetch users';
@@ -94,14 +95,14 @@ const AdminPage = () => {
         templateKey: formData.templateKey,
       };
 
-      const response = await axios.post('http://localhost:4000/api/problems', problemPayload, { withCredentials: true });
+      const response = await axios.post(`${API_BASE_URL}/problems`, problemPayload, { withCredentials: true });
 
       // Now add test cases
       if (testCases.length > 0) {
         for (const testCase of testCases) {
           if (testCase.input && testCase.expectedOutput) {
             try {
-              await axios.post('http://localhost:4000/api/testcases', {
+              await axios.post(`${API_BASE_URL}/testcases`, {
                 problem: response.data.payload._id,
                 input: testCase.input,
                 expectedOutput: testCase.expectedOutput,
@@ -138,7 +139,7 @@ const AdminPage = () => {
     setProblemsLoading(true);
     setProblemsMessage('');
     try {
-      const response = await axios.get('http://localhost:4000/api/problems', { withCredentials: true });
+      const response = await axios.get(`${API_BASE_URL}/problems`, { withCredentials: true });
       setProblems(response.data?.payload || []);
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || 'Failed to fetch problems';
@@ -151,7 +152,7 @@ const AdminPage = () => {
 
   const handleDeleteProblem = async (problemId) => {
     try {
-      await axios.delete(`http://localhost:4000/api/problems/${problemId}`, { withCredentials: true });
+      await axios.delete(`${API_BASE_URL}/problems/${problemId}`, { withCredentials: true });
       setProblemsMessage('✅ Problem deleted successfully');
       setDeleteProblemConfirm(null);
       fetchProblems();
@@ -163,7 +164,7 @@ const AdminPage = () => {
 
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`http://localhost:4000/api/users/${userId}`, { withCredentials: true });
+      await axios.delete(`${API_BASE_URL}/users/${userId}`, { withCredentials: true });
       setUsersMessage('✅ User deleted successfully');
       setDeleteConfirm(null);
       fetchUsers();

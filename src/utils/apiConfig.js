@@ -1,0 +1,2 @@
+export const BACKEND_URL = String(import.meta.env.VITE_BACKEND_URL || import.meta.env.BACKEND_URL || "http://localhost:4000").replace(/\/+$|\/+/g, "");
+export const API_BASE_URL = `${BACKEND_URL}/api`;

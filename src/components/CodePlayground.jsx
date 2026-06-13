@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
 import { useAuth } from '../store/authStore';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 const CodePlayground = () => {
   const { problemId } = useParams();
@@ -153,12 +154,12 @@ const CodePlayground = () => {
     if (problemId) {
       const fetchProblemData = async () => {
         try {
-          const problemRes = await axios.get(`http://localhost:4000/api/problems/${problemId}`, { withCredentials: true });
+          const problemRes = await axios.get(`${API_BASE_URL}/problems/${problemId}`, { withCredentials: true });
           const fetchedProblem = problemRes.data.payload;
           setProblem(fetchedProblem);
           setCode(getBoilerplate(fetchedProblem?.templateKey || 'twoSum', language));
 
-          const testRes = await axios.get(`http://localhost:4000/api/testcases/problem/${problemId}`, { withCredentials: true });
+          const testRes = await axios.get(`${API_BASE_URL}/testcases/problem/${problemId}`, { withCredentials: true });
           const fetchedCases = testRes.data.payload || [];
           setTestcases(fetchedCases);
           if (fetchedCases.length > 0) {
@@ -175,7 +176,7 @@ const CodePlayground = () => {
   useEffect(() => {
     const fetchProblemList = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/problems', { withCredentials: true });
+        const response = await axios.get(`${API_BASE_URL}/problems`, { withCredentials: true });
         setAllProblems(response.data?.payload || []);
       } catch (err) {
         console.error('Failed to fetch related problems', err);
@@ -198,7 +199,7 @@ const CodePlayground = () => {
       setSubmissionsError('');
 
       try {
-        const response = await axios.get(`http://localhost:4000/api/submissions?problem=${problemId}`, { withCredentials: true });
+        const response = await axios.get(`${API_BASE_URL}/submissions?problem=${problemId}`, { withCredentials: true });
         setSubmissions(response.data?.payload || []);
       } catch (err) {
         const errorMessage = err.response?.status === 401
@@ -238,7 +239,7 @@ const CodePlayground = () => {
       for (let i = 0; i < casesToRun.length; i++) {
         const tc = casesToRun[i];
         try {
-          const response = await axios.post('http://localhost:4000/api/playground/run', {
+          const response = await axios.post(`${API_BASE_URL}/playground/run`, {
             code,
             language,
             input: tc.input,
@@ -283,7 +284,7 @@ const CodePlayground = () => {
     setTestResults([]);
     
     try {
-      const response = await axios.post('http://localhost:4000/api/submissions', {
+      const response = await axios.post(`${API_BASE_URL}/submissions`, {
         problemId,
         code,
         language
