@@ -53,30 +53,67 @@ const CodePlayground = () => {
 
   const normalize = (value) => String(value || '').trim().toLowerCase();
 
+  const normalizeJsonLikeText = (text) => {
+    return String(text || '')
+      .replace(/\r\n/g, '\n')
+      .replace(/\t/g, ' ')
+      .replace(/\bNone\b/g, 'null')
+      .replace(/\bTrue\b/g, 'true')
+      .replace(/\bFalse\b/g, 'false')
+      .replace(/'/g, '"')
+      .replace(/([\[{,])\s*([A-Za-z_][A-Za-z0-9_]*)\s*:/g, '$1"$2":')
+      .replace(/:\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?=[,\]}])/g, ':"$1"')
+      .replace(/,\s*([}\]])/g, '$1')
+      .trim();
+  };
+
   const parseStructuredValue = (value) => {
     const text = String(value ?? '').trim();
     if (text === '') return text;
+
     try {
       return JSON.parse(text);
     } catch {
-      return text.replace(/\s+/g, ' ');
+      try {
+        return JSON.parse(normalizeJsonLikeText(text));
+      } catch {
+        return text.replace(/\s+/g, ' ').trim();
+      }
     }
   };
 
   const compareStructuredValues = (a, b) => {
     if (a === b) return true;
-    if (typeof a !== typeof b) return false;
-    if (a && b && typeof a === 'object') {
-      if (Array.isArray(a) && Array.isArray(b)) {
-        if (a.length !== b.length) return false;
-        return a.every((item, index) => compareStructuredValues(item, b[index]));
-      }
-      if (Array.isArray(a) || Array.isArray(b)) return false;
+    if (a == null || b == null) return a === b;
+
+    if (typeof a === 'number' && typeof b === 'string' && !Number.isNaN(Number(b))) {
+      return Math.abs(a - Number(b)) < Number.EPSILON;
+    }
+    if (typeof b === 'number' && typeof a === 'string' && !Number.isNaN(Number(a))) {
+      return Math.abs(Number(a) - b) < Number.EPSILON;
+    }
+
+    if (typeof a === 'boolean' && typeof b === 'string') {
+      return String(a).toLowerCase() === b.trim().toLowerCase();
+    }
+    if (typeof b === 'boolean' && typeof a === 'string') {
+      return String(b).toLowerCase() === a.trim().toLowerCase();
+    }
+
+    if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) return false;
+      return a.every((item, index) => compareStructuredValues(item, b[index]));
+    }
+
+    if (Array.isArray(a) || Array.isArray(b)) return false;
+
+    if (typeof a === 'object' && typeof b === 'object') {
       const aKeys = Object.keys(a).sort();
       const bKeys = Object.keys(b).sort();
       if (aKeys.length !== bKeys.length) return false;
-      return aKeys.every((key, index) => key === bKeys[index] && compareStructuredValues(a[key], b[key]));
+      return aKeys.every((key, index) => key === bKeys[index] && compareStructuredValues(a[key], b[bKeys[index]]));
     }
+
     return String(a).trim().replace(/\s+/g, ' ') === String(b).trim().replace(/\s+/g, ' ');
   };
 
