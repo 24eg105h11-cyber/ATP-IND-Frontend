@@ -1,3 +1,7 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { API_BASE_URL } from '../utils/apiConfig';
+
 const AdminPage = () => {
   // Add Problem States
   const [activeTab, setActiveTab] = useState('addProblem');
