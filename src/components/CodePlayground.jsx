@@ -62,7 +62,15 @@ const CodePlayground = () => {
     }
   }), []);
 
-  const currentTemplateKey = problem?.templateKey || 'twoSum';
+  const getExecutionTemplateName = (title) => {
+    const normalized = String(title || '').trim().toLowerCase();
+    if (normalized.includes('running sum')) return 'runningSum';
+    if (normalized.includes('product except self')) return 'productExceptSelf';
+    if (normalized.includes('plus one')) return 'plusOne';
+    return 'twoSum';
+  };
+
+  const currentTemplateKey = getExecutionTemplateName(problem?.title);
   const currentTemplate = problemTemplates[currentTemplateKey] || problemTemplates.twoSum;
   const currentSamples = currentTemplate.samples;
   const getBoilerplate = (templateKey, lang) => {
@@ -159,7 +167,7 @@ const CodePlayground = () => {
         const problemRes = await axios.get(`${API_BASE_URL}/problems/${problemId}`, { withCredentials: true });
         const fetchedProblem = problemRes.data.payload;
         setProblem(fetchedProblem);
-        setCode(getBoilerplate(fetchedProblem?.templateKey || 'twoSum', language));
+        setCode(getBoilerplate(getExecutionTemplateName(fetchedProblem?.title), language));
 
         const testRes = await axios.get(`${API_BASE_URL}/testcases/problem/${problemId}`, { withCredentials: true });
         const fetchedCases = testRes.data.payload || [];
@@ -247,7 +255,7 @@ const CodePlayground = () => {
             code,
             language,
             input: tc.input,
-            templateKey: currentTemplateKey
+            problemId
           }, { withCredentials: true });
 
           const { payload } = response.data;
