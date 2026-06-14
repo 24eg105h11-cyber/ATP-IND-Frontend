@@ -4,10 +4,15 @@ import { API_BASE_URL } from "../utils/apiConfig";
 
 const AUTH_TOKEN_KEY = "authToken";
 axios.defaults.withCredentials = true;
-const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
-if (storedToken) {
-  axios.defaults.headers.common.Authorization = `Bearer ${storedToken}`;
-}
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  if (token) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  config.withCredentials = true;
+  return config;
+});
 
 const getApiErrorMessage = (err, fallbackMessage) =>
   err.response?.data?.error || err.response?.data?.message || err.message || fallbackMessage;

@@ -54,6 +54,11 @@ const AdminPage = () => {
     }
   };
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('authToken');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -95,7 +100,11 @@ const AdminPage = () => {
         templateKey: formData.templateKey,
       };
 
-      const response = await axios.post(`${API_BASE_URL}/problems`, problemPayload, { withCredentials: true });
+      const response = await axios.post(
+        `${API_BASE_URL}/problems`,
+        problemPayload,
+        { withCredentials: true, headers: getAuthHeaders() }
+      );
 
       // Now add test cases
       if (testCases.length > 0) {
