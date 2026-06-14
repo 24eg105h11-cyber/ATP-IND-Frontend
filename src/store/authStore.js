@@ -2,6 +2,8 @@ import { create } from "zustand";
 import axios from "axios";
 import { API_BASE_URL } from "../utils/apiConfig";
 
+axios.defaults.withCredentials = true;
+
 const getApiErrorMessage = (err, fallbackMessage) =>
   err.response?.data?.error || err.response?.data?.message || err.message || fallbackMessage;
 
