@@ -11,58 +11,30 @@ const CodePlayground = () => {
   const [problemLoading, setProblemLoading] = useState(false);
   const [problemError, setProblemError] = useState('');
 
-  const problemTemplates = useMemo(() => ({
-    twoSum: {
-      javascript: `var twoSum = function(nums, target) {\n    \n};`,
-      python: `class Solution:\n    def twoSum(self, nums, target):\n        pass`,
-      java: `class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        \n    }\n}`,
-      cpp: `class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};`,
-      c: `int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    \n}`,
-      samples: [
-        { input: "[2,7,11,15]\n9", expectedOutput: "[0,1]" },
-        { input: "[3,2,4]\n6", expectedOutput: "[1,2]" },
-        { input: "[3,3]\n6", expectedOutput: "[0,1]" }
-      ]
-    },
-    runningSum: {
-      javascript: `var runningSum = function(nums) {\n    \n};`,
-      python: `class Solution:\n    def runningSum(self, nums):\n        pass`,
-      java: `class Solution {\n    public int[] runningSum(int[] nums) {\n        \n    }\n}`,
-      cpp: `class Solution {\npublic:\n    vector<int> runningSum(vector<int>& nums) {\n        \n    }\n};`,
-      c: `int* runningSum(int* nums, int numsSize, int* returnSize) {\n    \n}`,
-      samples: [
-        { input: "[1,2,3,4]", expectedOutput: "[1,3,6,10]" },
-        { input: "[1,1,1,1,1]", expectedOutput: "[1,2,3,4,5]" },
-        { input: "[3,1,2,10,1]", expectedOutput: "[3,4,6,16,17]" }
-      ]
-    },
-    productExceptSelf: {
-      javascript: `var productExceptSelf = function(nums) {\n    \n};`,
-      python: `class Solution:\n    def productExceptSelf(self, nums):\n        pass`,
-      java: `class Solution {\n    public int[] productExceptSelf(int[] nums) {\n        \n    }\n}`,
-      cpp: `class Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        \n    }\n};`,
-      c: `int* productExceptSelf(int* nums, int numsSize, int* returnSize) {\n    \n}`,
-      samples: [
-        { input: "[1,2,3,4]", expectedOutput: "[24,12,8,6]" },
-        { input: "[-1,1,0,-3,3]", expectedOutput: "[0,0,9,0,0]" },
-        { input: "[2,3,4,5]", expectedOutput: "[60,40,30,24]" }
-      ]
-    },
-    plusOne: {
-      javascript: `var plusOne = function(digits) {\n    \n};`,
-      python: `class Solution:\n    def plusOne(self, digits):\n        pass`,
-      java: `class Solution {\n    public int[] plusOne(int[] digits) {\n        \n    }\n}`,
-      cpp: `class Solution {\npublic:\n    vector<int> plusOne(vector<int>& digits) {\n        \n    }\n};`,
-      c: `int* plusOne(int* digits, int digitsSize, int* returnSize) {\n    \n}`,
-      samples: [
-        { input: "[1,2,3]", expectedOutput: "[1,2,4]" },
-        { input: "[4,3,2,1]", expectedOutput: "[4,3,2,2]" },
-        { input: "[9]", expectedOutput: "[1,0]" }
-      ]
-    }
+  const sampleCasesByProblem = useMemo(() => ({
+    twoSum: [
+      { input: "[2,7,11,15]\n9", expectedOutput: "[0,1]" },
+      { input: "[3,2,4]\n6", expectedOutput: "[1,2]" },
+      { input: "[3,3]\n6", expectedOutput: "[0,1]" }
+    ],
+    runningSum: [
+      { input: "[1,2,3,4]", expectedOutput: "[1,3,6,10]" },
+      { input: "[1,1,1,1,1]", expectedOutput: "[1,2,3,4,5]" },
+      { input: "[3,1,2,10,1]", expectedOutput: "[3,4,6,16,17]" }
+    ],
+    productExceptSelf: [
+      { input: "[1,2,3,4]", expectedOutput: "[24,12,8,6]" },
+      { input: "[-1,1,0,-3,3]", expectedOutput: "[0,0,9,0,0]" },
+      { input: "[2,3,4,5]", expectedOutput: "[60,40,30,24]" }
+    ],
+    plusOne: [
+      { input: "[1,2,3]", expectedOutput: "[1,2,4]" },
+      { input: "[4,3,2,1]", expectedOutput: "[4,3,2,2]" },
+      { input: "[9]", expectedOutput: "[1,0]" }
+    ]
   }), []);
 
-  const getExecutionTemplateName = (title) => {
+  const getProblemType = (title) => {
     const normalized = String(title || '').trim().toLowerCase();
     if (normalized.includes('running sum')) return 'runningSum';
     if (normalized.includes('product except self')) return 'productExceptSelf';
@@ -70,13 +42,8 @@ const CodePlayground = () => {
     return 'twoSum';
   };
 
-  const currentTemplateKey = getExecutionTemplateName(problem?.title);
-  const currentTemplate = problemTemplates[currentTemplateKey] || problemTemplates.twoSum;
-  const currentSamples = currentTemplate.samples;
-  const getBoilerplate = (templateKey, lang) => {
-    const template = problemTemplates[templateKey] || problemTemplates.twoSum;
-    return template[lang] || template.javascript;
-  };
+  const currentProblemType = getProblemType(problem?.title);
+  const currentSamples = sampleCasesByProblem[currentProblemType] || sampleCasesByProblem.twoSum;
 
   const formatDisplayTitle = (value) => String(value || '').replace(/([a-z])([A-Z0-9])/g, '$1 $2').replace(/\s+/g, ' ').trim();
   const currentProblemTitle = formatDisplayTitle(problem?.title || 'this problem');
@@ -141,7 +108,7 @@ const CodePlayground = () => {
   }, [allProblems, currentUser?.completedProblems, problem]);
 
   const [language, setLanguage] = useState('javascript');
-  const [code, setCode] = useState(currentTemplate.javascript);
+  const [code, setCode] = useState('');
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
   const [testcases, setTestcases] = useState([]);
@@ -167,7 +134,6 @@ const CodePlayground = () => {
         const problemRes = await axios.get(`${API_BASE_URL}/problems/${problemId}`, { withCredentials: true });
         const fetchedProblem = problemRes.data.payload;
         setProblem(fetchedProblem);
-        setCode(getBoilerplate(getExecutionTemplateName(fetchedProblem?.title), language));
 
         const testRes = await axios.get(`${API_BASE_URL}/testcases/problem/${problemId}`, { withCredentials: true });
         const fetchedCases = testRes.data.payload || [];
@@ -199,10 +165,6 @@ const CodePlayground = () => {
 
     fetchProblemList();
   }, []);
-
-  useEffect(() => {
-    setCode(getBoilerplate(currentTemplateKey, language));
-  }, [currentTemplateKey, language, problemTemplates]);
 
   useEffect(() => {
     const fetchSubmissions = async () => {
@@ -528,7 +490,6 @@ const CodePlayground = () => {
               onChange={(e) => {
                 const newLang = e.target.value;
                 setLanguage(newLang);
-                setCode(getBoilerplate(currentTemplateKey, newLang));
               }}
               style={{ padding: '4px 8px', fontSize: '0.85rem', borderRadius: '4px', backgroundColor: '#0f172a', color: '#fff', border: '1px solid #334155' }}
             >
