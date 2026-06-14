@@ -53,22 +53,31 @@ const CodePlayground = () => {
 
   const normalize = (value) => String(value || '').trim().toLowerCase();
 
+  const normalizeWhitespace = (value) => {
+    const text = typeof value === 'string' ? value : String(value ?? '');
+    return text.replace(/\r\n/g, '\n').replace(/\t/g, ' ').replace(/\s+/g, ' ').trim();
+  };
+
   const normalizeJsonLikeText = (text) => {
-    return String(text || '')
-      .replace(/\r\n/g, '\n')
-      .replace(/\t/g, ' ')
-      .replace(/\bNone\b/g, 'null')
-      .replace(/\bTrue\b/g, 'true')
-      .replace(/\bFalse\b/g, 'false')
-      .replace(/'/g, '"')
-      .replace(/\b([A-Za-z_][A-Za-z0-9_]*)\b\s*:/g, '"$1":')
-      .replace(/:\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?=[,\]}])/g, ':"$1"')
-      .replace(/,\s*([}\]])/g, '$1')
-      .trim();
+    let normalized = normalizeWhitespace(text);
+    normalized = normalized.replace(/\bNone\b/g, 'null');
+    normalized = normalized.replace(/\bTrue\b/g, 'true');
+    normalized = normalized.replace(/\bFalse\b/g, 'false');
+    normalized = normalized.replace(/'/g, '"');
+    normalized = normalized.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\b\s*:/g, '"$1":');
+    normalized = normalized.replace(/:\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?=[,\]}])/g, (match, token) => {
+      const normalizedToken = token.toLowerCase();
+      if (normalizedToken === 'true' || normalizedToken === 'false' || normalizedToken === 'null') {
+        return `: ${normalizedToken}`;
+      }
+      return `: "${token}"`;
+    });
+    normalized = normalized.replace(/,\s*([}\]])/g, '$1');
+    return normalized;
   };
 
   const parseStructuredValue = (value) => {
-    const text = String(value ?? '').trim();
+    const text = normalizeWhitespace(value);
     if (text === '') return text;
 
     try {
@@ -77,7 +86,7 @@ const CodePlayground = () => {
       try {
         return JSON.parse(normalizeJsonLikeText(text));
       } catch {
-        return text.replace(/\s+/g, ' ').trim();
+        return text;
       }
     }
   };
@@ -86,18 +95,20 @@ const CodePlayground = () => {
     if (a === b) return true;
     if (a == null || b == null) return a === b;
 
-    if (typeof a === 'number' && typeof b === 'string' && !Number.isNaN(Number(b))) {
-      return Math.abs(a - Number(b)) < Number.EPSILON;
-    }
-    if (typeof b === 'number' && typeof a === 'string' && !Number.isNaN(Number(a))) {
-      return Math.abs(Number(a) - b) < Number.EPSILON;
-    }
-
-    if (typeof a === 'boolean' && typeof b === 'string') {
-      return String(a).toLowerCase() === b.trim().toLowerCase();
-    }
-    if (typeof b === 'boolean' && typeof a === 'string') {
-      return String(b).toLowerCase() === a.trim().toLowerCase();
+    if (typeof a !== typeof b) {
+      if (typeof a === 'string' && typeof b === 'number') {
+        return !Number.isNaN(Number(a)) && Math.abs(Number(a) - b) < Number.EPSILON;
+      }
+      if (typeof b === 'string' && typeof a === 'number') {
+        return !Number.isNaN(Number(b)) && Math.abs(a - Number(b)) < Number.EPSILON;
+      }
+      if (typeof a === 'string' && typeof b === 'boolean') {
+        return a.trim().toLowerCase() === String(b).toLowerCase();
+      }
+      if (typeof b === 'string' && typeof a === 'boolean') {
+        return b.trim().toLowerCase() === String(a).toLowerCase();
+      }
+      return false;
     }
 
     if (Array.isArray(a) && Array.isArray(b)) {
@@ -114,7 +125,15 @@ const CodePlayground = () => {
       return aKeys.every((key, index) => key === bKeys[index] && compareStructuredValues(a[key], b[bKeys[index]]));
     }
 
-    return String(a).trim().replace(/\s+/g, ' ') === String(b).trim().replace(/\s+/g, ' ');
+    if (typeof a === 'number' && typeof b === 'number') {
+      return Math.abs(a - b) < Number.EPSILON;
+    }
+
+    if (typeof a === 'string' && typeof b === 'string') {
+      return normalizeWhitespace(a) === normalizeWhitespace(b);
+    }
+
+    return a === b;
   };
 
   const relatedChallenges = useMemo(() => {
