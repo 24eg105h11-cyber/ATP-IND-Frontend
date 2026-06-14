@@ -13,11 +13,11 @@ const CodePlayground = () => {
 
   const problemTemplates = useMemo(() => ({
     twoSum: {
-      javascript: `/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar twoSum = function(nums, target) {\n    \n};`,
-      python: `class Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        pass`,
+      javascript: `var twoSum = function(nums, target) {\n    \n};`,
+      python: `class Solution:\n    def twoSum(self, nums, target):\n        pass`,
       java: `class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        \n    }\n}`,
       cpp: `class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};`,
-      c: `/**\n * Note: The returned array must be malloced, assume caller calls free().\n */\nint* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    \n}`,
+      c: `int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    \n}`,
       samples: [
         { input: "[2,7,11,15]\n9", expectedOutput: "[0,1]" },
         { input: "[3,2,4]\n6", expectedOutput: "[1,2]" },
@@ -25,11 +25,11 @@ const CodePlayground = () => {
       ]
     },
     runningSum: {
-      javascript: `/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar runningSum = function(nums) {\n    \n};`,
-      python: `class Solution:\n    def runningSum(self, nums: List[int]) -> List[int]:\n        pass`,
+      javascript: `var runningSum = function(nums) {\n    \n};`,
+      python: `class Solution:\n    def runningSum(self, nums):\n        pass`,
       java: `class Solution {\n    public int[] runningSum(int[] nums) {\n        \n    }\n}`,
       cpp: `class Solution {\npublic:\n    vector<int> runningSum(vector<int>& nums) {\n        \n    }\n};`,
-      c: `/**\n * Note: The returned array must be malloced, assume caller calls free().\n */\nint* runningSum(int* nums, int numsSize, int* returnSize) {\n    \n}`,
+      c: `int* runningSum(int* nums, int numsSize, int* returnSize) {\n    \n}`,
       samples: [
         { input: "[1,2,3,4]", expectedOutput: "[1,3,6,10]" },
         { input: "[1,1,1,1,1]", expectedOutput: "[1,2,3,4,5]" },
@@ -37,11 +37,11 @@ const CodePlayground = () => {
       ]
     },
     productExceptSelf: {
-      javascript: `/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar productExceptSelf = function(nums) {\n    \n};`,
-      python: `class Solution:\n    def productExceptSelf(self, nums: List[int]) -> List[int]:\n        pass`,
+      javascript: `var productExceptSelf = function(nums) {\n    \n};`,
+      python: `class Solution:\n    def productExceptSelf(self, nums):\n        pass`,
       java: `class Solution {\n    public int[] productExceptSelf(int[] nums) {\n        \n    }\n}`,
       cpp: `class Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        \n    }\n};`,
-      c: `/**\n * Note: The returned array must be malloced, assume caller calls free().\n */\nint* productExceptSelf(int* nums, int numsSize, int* returnSize) {\n    \n}`,
+      c: `int* productExceptSelf(int* nums, int numsSize, int* returnSize) {\n    \n}`,
       samples: [
         { input: "[1,2,3,4]", expectedOutput: "[24,12,8,6]" },
         { input: "[-1,1,0,-3,3]", expectedOutput: "[0,0,9,0,0]" },
@@ -49,11 +49,11 @@ const CodePlayground = () => {
       ]
     },
     plusOne: {
-      javascript: `/**\n * @param {number[]} digits\n * @return {number[]}\n */\nvar plusOne = function(digits) {\n    \n};`,
-      python: `class Solution:\n    def plusOne(self, digits: List[int]) -> List[int]:\n        pass`,
+      javascript: `var plusOne = function(digits) {\n    \n};`,
+      python: `class Solution:\n    def plusOne(self, digits):\n        pass`,
       java: `class Solution {\n    public int[] plusOne(int[] digits) {\n        \n    }\n}`,
       cpp: `class Solution {\npublic:\n    vector<int> plusOne(vector<int>& digits) {\n        \n    }\n};`,
-      c: `/**\n * Note: The returned array must be malloced, assume caller calls free().\n */\nint* plusOne(int* digits, int digitsSize, int* returnSize) {\n    \n}`,
+      c: `int* plusOne(int* digits, int digitsSize, int* returnSize) {\n    \n}`,
       samples: [
         { input: "[1,2,3]", expectedOutput: "[1,2,4]" },
         { input: "[4,3,2,1]", expectedOutput: "[4,3,2,2]" },
@@ -72,43 +72,38 @@ const CodePlayground = () => {
 
   const formatDisplayTitle = (value) => String(value || '').replace(/([a-z])([A-Z0-9])/g, '$1 $2').replace(/\s+/g, ' ').trim();
   const currentProblemTitle = formatDisplayTitle(problem?.title || 'this problem');
-  const editorialStepsByLanguage = useMemo(() => ({
-    javascript: [
-      `Read ${currentProblemTitle}, identify the input shape, and translate it into a small helper function first.`,
-      `Use a plain loop or a hash map depending on the pattern in ${currentTemplateKey}; keep the logic direct and readable.`,
-      `Return the final value in the format the problem expects, then compare against the sample cases.`
-    ],
-    python: [
-      `Start with the Solution class and write the cleanest version of the core idea for ${currentProblemTitle}.`,
-      `Use Python lists, dicts, or slicing only when they make the pattern simpler; avoid extra ceremony.`,
-      `Check the sample inputs and make sure your return type matches the expected output exactly.`
-    ],
-    java: [
-      `Declare the method signature first, then map ${currentProblemTitle} into arrays, HashMap, or two pointers as needed.`,
-      `Use strong types and early returns so the control flow stays easy to follow.`,
-      `Verify that your final array or collection is built before returning from the method.`
-    ],
-    cpp: [
-      `Set up the Solution class and choose vector or unordered_map based on the pattern behind ${currentTemplateKey}.`,
-      `Keep the loop logic tight and prefer indexed access when the problem works on arrays.`,
-      `Return the final vector directly and compare against the sample outputs.`
-    ],
-    c: [
-      `Use the provided function signature, read the inputs carefully, and work with raw arrays for ${currentProblemTitle}.`,
-      `Track sizes and positions explicitly, because C requires you to manage indexing and return values yourself.`,
-      `Fill the output buffer or returned array, then set returnSize correctly before finishing.`
-    ],
-    r: [
-      `Treat the problem as a vector/list transformation and describe the steps before coding the R version.`,
-      `Use indexing, loops, and vector operations to mirror the same pattern you would use in the other languages.`,
-      `Return the final structure in the same shape as the expected output and double-check the sample cases.`
-    ]
-  }), [currentProblemTitle, currentTemplateKey]);
 
   const [allProblems, setAllProblems] = useState([]);
   const { currentUser, markProblemCompleted } = useAuth();
 
   const normalize = (value) => String(value || '').trim().toLowerCase();
+
+  const parseStructuredValue = (value) => {
+    const text = String(value ?? '').trim();
+    if (text === '') return text;
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text.replace(/\s+/g, ' ');
+    }
+  };
+
+  const compareStructuredValues = (a, b) => {
+    if (a === b) return true;
+    if (typeof a !== typeof b) return false;
+    if (a && b && typeof a === 'object') {
+      if (Array.isArray(a) && Array.isArray(b)) {
+        if (a.length !== b.length) return false;
+        return a.every((item, index) => compareStructuredValues(item, b[index]));
+      }
+      if (Array.isArray(a) || Array.isArray(b)) return false;
+      const aKeys = Object.keys(a).sort();
+      const bKeys = Object.keys(b).sort();
+      if (aKeys.length !== bKeys.length) return false;
+      return aKeys.every((key, index) => key === bKeys[index] && compareStructuredValues(a[key], b[key]));
+    }
+    return String(a).trim().replace(/\s+/g, ' ') === String(b).trim().replace(/\s+/g, ' ');
+  };
 
   const relatedChallenges = useMemo(() => {
     if (!problem) return [];
@@ -256,13 +251,16 @@ const CodePlayground = () => {
           }, { withCredentials: true });
 
           const { payload } = response.data;
+          const actualValue = parseStructuredValue(payload.output || payload.error || '');
+          const expectedValue = parseStructuredValue(tc.expectedOutput || '');
+          const passed = payload.status === 'success' && compareStructuredValues(actualValue, expectedValue);
           results.push({
             case: i + 1,
             input: tc.input,
             expected: tc.expectedOutput,
-            actual: payload.output || payload.error || "No output",
-            passed: tc.expectedOutput ? payload.output?.trim() === tc.expectedOutput?.trim() : true,
-            error: payload.error
+            actual: payload.output || payload.error || 'No output',
+            passed,
+            error: payload.error || (payload.status !== 'success' ? payload.runtimeError || payload.compileError || 'Execution failed' : '')
           });
         } catch (err) {
           results.push({
@@ -365,7 +363,6 @@ const CodePlayground = () => {
             
             <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid #334155', marginBottom: '16px', fontSize: '0.9rem' }}>
               <button type="button" onClick={() => setActiveInfoTab('description')} style={{ paddingBottom: '8px', borderBottomWidth: '2px', borderBottomStyle: 'solid', borderBottomColor: activeInfoTab === 'description' ? '#3b82f6' : 'transparent', cursor: 'pointer', color: activeInfoTab === 'description' ? '#fff' : '#94a3b8', background: 'none', borderWidth: 0, borderStyle: 'none' }}>Description</button>
-              <button type="button" onClick={() => setActiveInfoTab('editorial')} style={{ paddingBottom: '8px', borderBottomWidth: '2px', borderBottomStyle: 'solid', borderBottomColor: activeInfoTab === 'editorial' ? '#3b82f6' : 'transparent', cursor: 'pointer', color: activeInfoTab === 'editorial' ? '#fff' : '#94a3b8', background: 'none', borderWidth: 0, borderStyle: 'none' }}>Editorial</button>
               <button type="button" onClick={() => setActiveInfoTab('solutions')} style={{ paddingBottom: '8px', borderBottomWidth: '2px', borderBottomStyle: 'solid', borderBottomColor: activeInfoTab === 'solutions' ? '#3b82f6' : 'transparent', cursor: 'pointer', color: activeInfoTab === 'solutions' ? '#fff' : '#94a3b8', background: 'none', borderWidth: 0, borderStyle: 'none' }}>Solutions</button>
               <button type="button" onClick={() => setActiveInfoTab('submissions')} style={{ paddingBottom: '8px', borderBottomWidth: '2px', borderBottomStyle: 'solid', borderBottomColor: activeInfoTab === 'submissions' ? '#3b82f6' : 'transparent', cursor: 'pointer', color: activeInfoTab === 'submissions' ? '#fff' : '#94a3b8', background: 'none', borderWidth: 0, borderStyle: 'none' }}>Submissions</button>
             </div>
@@ -418,45 +415,6 @@ const CodePlayground = () => {
               </>
             )}
 
-            {activeInfoTab === 'editorial' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '4px' }}>
-                <div style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '18px 20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                  <p style={{ margin: '0 0 6px', color: '#64748b', fontSize: '0.8rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Editorial</p>
-                  <h3 style={{ margin: '0 0 8px', color: '#1e293b', fontSize: '1.1rem', lineHeight: 1.25 }}>Steps to solve {currentProblemTitle}</h3>
-                  <p style={{ margin: 0, color: '#475569', lineHeight: 1.65, maxWidth: '760px' }}>
-                    Follow the same pattern in each language, but adapt the syntax and data structures to the language you are using.
-                  </p>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
-                {Object.entries(editorialStepsByLanguage).map(([langKey, steps]) => {
-                  const languageLabel = languages.find((item) => item.value === langKey)?.label || langKey.toUpperCase();
-
-                  return (
-                    <div key={langKey} style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '16px 16px 18px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', borderTop: '4px solid #3b82f6' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '12px', alignItems: 'center' }}>
-                        <h4 style={{ margin: 0, color: '#1e293b', fontSize: '1rem', fontWeight: '800' }}>{languageLabel}</h4>
-                        <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', backgroundColor: '#f8fafc', padding: '4px 8px', borderRadius: '999px' }}>
-                          {currentTemplateKey}
-                        </span>
-                      </div>
-
-                      <div style={{ display: 'grid', gap: '12px' }}>
-                        {steps.map((step, idx) => (
-                          <div key={`${langKey}-${idx}`} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                            <span style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#3b82f6', color: '#fff', fontSize: '0.78rem', fontWeight: '800', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
-                              {idx + 1}
-                            </span>
-                            <p style={{ margin: 0, color: '#475569', lineHeight: 1.7, fontSize: '0.92rem' }}>{step}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-                </div>
-              </div>
-            )}
 
             {activeInfoTab === 'solutions' && (
               <div style={{ color: '#cbd5e1', lineHeight: 1.7 }}>
