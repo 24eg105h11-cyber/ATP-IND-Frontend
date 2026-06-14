@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../utils/apiConfig';
 
@@ -10,8 +10,7 @@ const AdminPage = () => {
     description: '',
     difficulty: 'easy',
     tags: '',
-    constraints: '',
-    templateKey: 'twoSum'
+    constraints: ''
   });
   const [testCases, setTestCases] = useState([{ input: '', expectedOutput: '', explanation: '' }]);
   const [problemLoading, setProblemLoading] = useState(false);
@@ -84,7 +83,6 @@ const AdminPage = () => {
     setProblemMessage('');
 
     try {
-      // Validate required fields
       if (!formData.title || !formData.description || !formData.difficulty) {
         setProblemMessage('Error: Title, description, and difficulty are required');
         setProblemLoading(false);
@@ -95,29 +93,27 @@ const AdminPage = () => {
         title: formData.title,
         description: formData.description,
         difficulty: formData.difficulty,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-        constraints: formData.constraints.split('\n').map(constraint => constraint.trim()).filter(constraint => constraint),
-        templateKey: formData.templateKey,
+        tags: formData.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
+        constraints: formData.constraints.split('\n').map((constraint) => constraint.trim()).filter(Boolean),
       };
 
-      const response = await axios.post(
-        `${API_BASE_URL}/problems`,
-        problemPayload,
-        { withCredentials: true, headers: getAuthHeaders() }
-      );
+      const response = await axios.post(`${API_BASE_URL}/problems`, problemPayload, {
+        withCredentials: true,
+        headers: getAuthHeaders(),
+      });
 
-      // Now add test cases
-      if (testCases.length > 0) {
+      const createdProblemId = response.data?.payload?._id;
+      if (createdProblemId && testCases.length > 0) {
         for (const testCase of testCases) {
-          if (testCase.input && testCase.expectedOutput) {
+          if (testCase.input || testCase.expectedOutput) {
             try {
               await axios.post(`${API_BASE_URL}/testcases`, {
-                problem: response.data.payload._id,
+                problem: createdProblemId,
                 input: testCase.input,
                 expectedOutput: testCase.expectedOutput,
                 isSample: true,
-                explanation: testCase.explanation || ''
-              }, { withCredentials: true });
+                explanation: testCase.explanation || '',
+              }, { withCredentials: true, headers: getAuthHeaders() });
             } catch (err) {
               console.error('Failed to add test case:', err);
             }
@@ -126,16 +122,15 @@ const AdminPage = () => {
       }
 
       setProblemMessage(`✅ Problem "${formData.title}" created successfully!`);
-      // Reset form
       setFormData({
         title: '',
         description: '',
         difficulty: 'easy',
         tags: '',
         constraints: '',
-        templateKey: 'twoSum'
       });
       setTestCases([{ input: '', expectedOutput: '', explanation: '' }]);
+      fetchProblems();
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || 'Failed to create problem';
       setProblemMessage(`Error: ${errorMsg}`);
@@ -147,6 +142,7 @@ const AdminPage = () => {
   const fetchProblems = async () => {
     setProblemsLoading(true);
     setProblemsMessage('');
+
     try {
       const response = await axios.get(`${API_BASE_URL}/problems`, { withCredentials: true });
       setProblems(response.data?.payload || []);
@@ -162,7 +158,7 @@ const AdminPage = () => {
   const handleDeleteProblem = async (problemId) => {
     try {
       await axios.delete(`${API_BASE_URL}/problems/${problemId}`, { withCredentials: true });
-      setProblemsMessage('✅ Problem deleted successfully');
+      setProblemsMessage('âœ… Problem deleted successfully');
       setDeleteProblemConfirm(null);
       fetchProblems();
     } catch (err) {
@@ -174,7 +170,7 @@ const AdminPage = () => {
   const handleDeleteUser = async (userId) => {
     try {
       await axios.delete(`${API_BASE_URL}/users/${userId}`, { withCredentials: true });
-      setUsersMessage('✅ User deleted successfully');
+      setUsersMessage('âœ… User deleted successfully');
       setDeleteConfirm(null);
       fetchUsers();
     } catch (err) {
@@ -306,30 +302,6 @@ const AdminPage = () => {
                   </select>
                 </div>
 
-                {/* Template Key */}
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#334155' }}>Template Key</label>
-                  <select
-                    name="templateKey"
-                    value={formData.templateKey}
-                    onChange={handleFormChange}
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      fontSize: '0.95rem',
-                      fontFamily: 'inherit',
-                      boxSizing: 'border-box'
-                    }}
-                  >
-                    <option value="twoSum">Two Sum</option>
-                    <option value="runningSum">Running Sum</option>
-                    <option value="productExceptSelf">Product Except Self</option>
-                    <option value="plusOne">Plus One</option>
-                  </select>
-                </div>
-
                 {/* Tags */}
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#334155' }}>Tags (comma-separated)</label>
@@ -382,7 +354,7 @@ const AdminPage = () => {
                   name="constraints"
                   value={formData.constraints}
                   onChange={handleFormChange}
-                  placeholder="e.g., 2 ≤ nums.length ≤ 10⁴&#10;-10⁹ ≤ nums[i] ≤ 10⁹"
+                  placeholder="e.g., 2 â‰¤ nums.length â‰¤ 10â´&#10;-10â¹ â‰¤ nums[i] â‰¤ 10â¹"
                   style={{
                     width: '100%',
                     padding: '12px',
