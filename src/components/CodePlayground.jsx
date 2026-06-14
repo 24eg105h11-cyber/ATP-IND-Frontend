@@ -61,7 +61,7 @@ const CodePlayground = () => {
       .replace(/\bTrue\b/g, 'true')
       .replace(/\bFalse\b/g, 'false')
       .replace(/'/g, '"')
-      .replace(/([\[{,])\s*([A-Za-z_][A-Za-z0-9_]*)\s*:/g, '$1"$2":')
+      .replace(/\b([A-Za-z_][A-Za-z0-9_]*)\b\s*:/g, '"$1":')
       .replace(/:\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?=[,\]}])/g, ':"$1"')
       .replace(/,\s*([}\]])/g, '$1')
       .trim();
