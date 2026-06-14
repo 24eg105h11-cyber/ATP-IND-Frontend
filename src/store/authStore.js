@@ -2,7 +2,12 @@ import { create } from "zustand";
 import axios from "axios";
 import { API_BASE_URL } from "../utils/apiConfig";
 
+const AUTH_TOKEN_KEY = "authToken";
 axios.defaults.withCredentials = true;
+const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
+if (storedToken) {
+  axios.defaults.headers.common.Authorization = `Bearer ${storedToken}`;
+}
 
 const getApiErrorMessage = (err, fallbackMessage) =>
   err.response?.data?.error || err.response?.data?.message || err.message || fallbackMessage;
@@ -39,6 +44,12 @@ export const useAuth = create((set) => ({
       set({ loading: true, error: null });
       const res = await axios.post(`${API_BASE_URL}/users/login`, userCred, { withCredentials: true });
       if (res.status === 200) {
+        const token = res.data?.token;
+        if (token) {
+          localStorage.setItem(AUTH_TOKEN_KEY, token);
+          axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+        }
+
         set({
           currentUser: res.data?.payload,
           loading: false,
@@ -75,6 +86,8 @@ export const useAuth = create((set) => ({
   logout: async () => {
     try {
       await axios.post(`${API_BASE_URL}/users/logout`, {}, { withCredentials: true });
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      delete axios.defaults.headers.common.Authorization;
       set({
         currentUser: null,
         isAuthenticated: false,
