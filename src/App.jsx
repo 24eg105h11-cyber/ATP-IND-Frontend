@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom'
 import CodePlayground from './components/CodePlayground'
 import LoginPage from './components/LoginPage'
 import RegistrationPage from './components/RegistrationPage'
