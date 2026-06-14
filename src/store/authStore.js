@@ -1,4 +1,3 @@
-NOCHANGE
 const AUTH_TOKEN_KEY = "authToken";
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use((config) => {
