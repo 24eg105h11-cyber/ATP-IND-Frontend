@@ -91,6 +91,32 @@ const CodePlayground = () => {
     }
   };
 
+  const logFrontendComparisonDebug = ({
+    testIndex,
+    rawActual,
+    rawExpected,
+    normalizedActual,
+    normalizedExpected,
+    parsedActual,
+    parsedExpected,
+    executionStatus,
+    passed,
+    reason
+  }) => {
+    console.log("=== FRONTEND TEST DEBUG ===");
+    console.log("Test index:", testIndex);
+    console.log("Execution status:", executionStatus);
+    console.log("Raw actual output:", JSON.stringify(rawActual));
+    console.log("Raw expected output:", JSON.stringify(rawExpected));
+    console.log("Normalized actual:", JSON.stringify(normalizedActual));
+    console.log("Normalized expected:", JSON.stringify(normalizedExpected));
+    console.log("Parsed actual:", parsedActual);
+    console.log("Parsed expected:", parsedExpected);
+    console.log("Comparison result:", passed);
+    if (reason) console.log("Failure reason:", reason);
+    console.log("=== END FRONTEND TEST DEBUG ===");
+  };
+
   const compareStructuredValues = (a, b) => {
     if (a === b) return true;
     if (a == null || b == null) return a === b;
@@ -277,14 +303,34 @@ const CodePlayground = () => {
           }, { withCredentials: true });
 
           const { payload } = response.data;
-          const actualValue = parseStructuredValue(payload.output || payload.error || '');
-          const expectedValue = parseStructuredValue(tc.expectedOutput || '');
+          const rawActual = payload.output ?? payload.error ?? '';
+          const rawExpected = tc.expectedOutput ?? '';
+          const normalizedActual = normalizeWhitespace(rawActual);
+          const normalizedExpected = normalizeWhitespace(rawExpected);
+          const actualValue = parseStructuredValue(rawActual);
+          const expectedValue = parseStructuredValue(rawExpected);
           const passed = payload.status === 'success' && compareStructuredValues(actualValue, expectedValue);
+
+          if (!passed) {
+            logFrontendComparisonDebug({
+              testIndex: i,
+              rawActual,
+              rawExpected,
+              normalizedActual,
+              normalizedExpected,
+              parsedActual: actualValue,
+              parsedExpected: expectedValue,
+              executionStatus: payload.status,
+              passed,
+              reason: payload.status !== 'success' ? 'Execution failed' : 'Structured comparison failed'
+            });
+          }
+
           results.push({
             case: i + 1,
             input: tc.input,
-            expected: tc.expectedOutput,
-            actual: payload.output || payload.error || 'No output',
+            expected: rawExpected,
+            actual: rawActual === '' ? 'No output' : rawActual,
             passed,
             error: payload.error || (payload.status !== 'success' ? payload.runtimeError || payload.compileError || 'Execution failed' : '')
           });
