@@ -5,11 +5,17 @@ const LandingPage = () => {
   return (
     <div style={styles.container}>
       <div style={styles.hero}>
-        <img
-          src="https://www.21kschool.com/in/wp-content/uploads/sites/4/2023/11/15-Facts-About-Coding-Every-Kid-Should-Know.png"
-          alt="coding illustration"
-          style={styles.leftIllustration}
-        />
+        <div style={styles.leftIllustration}>
+          <div style={styles.heroCard}>
+            <h2 style={styles.heroCardTitle}>Practice real coding problems in the browser.</h2>
+            <p style={styles.heroCardText}>
+              Write, run, and validate solutions with instant feedback using a built-in code playground.
+            </p>
+            <pre style={styles.codeSnippet}>{`function solve(nums) {
+  return nums.map(n => n * 2);
+}`}</pre>
+          </div>
+        </div>
 
         <div style={styles.content}>
           <h1 style={styles.title}>A New Way to Learn</h1>
@@ -64,11 +70,45 @@ const styles = {
   },
   leftIllustration: {
     width: '560px',
-    height: '320px',
-    objectFit: 'cover',
+    minHeight: '320px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: '18px',
     boxShadow: '0 40px 80px rgba(2,6,23,0.6)',
-    transform: 'rotate(-6deg)'
+    background: 'linear-gradient(135deg, #0d1a36 0%, #172d4e 100%)'
+  },
+  heroCard: {
+    width: '100%',
+    padding: '32px',
+    borderRadius: '18px',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    color: '#e2e8f0',
+  },
+  heroCardTitle: {
+    fontSize: '28px',
+    margin: '0 0 12px',
+    lineHeight: 1.2,
+    fontWeight: 800
+  },
+  heroCardText: {
+    color: '#cbd5e1',
+    marginBottom: '20px',
+    fontSize: '16px',
+    lineHeight: 1.6
+  },
+  codeSnippet: {
+    margin: 0,
+    padding: '18px',
+    borderRadius: '14px',
+    background: 'rgba(17, 24, 39, 0.9)',
+    color: '#d6deeb',
+    fontFamily: 'monospace',
+    fontSize: '14px',
+    lineHeight: 1.6,
+    whiteSpace: 'pre-wrap',
+    overflowX: 'auto'
   },
   content: {
     maxWidth: '640px',

@@ -115,6 +115,7 @@ function App() {
             path="/admin" 
             element={isAuthenticated && currentUser?.role === 'admin' ? <AdminPage /> : <Navigate to="/" />} 
           />
+<Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </Router>
